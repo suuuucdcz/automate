@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Derovia | Démo Devis Magique</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <style>
+    /* Spécifique à la vue Devis Magique */
+    body { background-color: var(--bg-secondary); min-height: 100vh; }
+    
+    .demo-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 100px 16px 60px;
+    }
+
+    .demo-header { text-align: center; margin-bottom: 32px; }
+    .demo-header h1 { font-size: 2.2rem; margin-bottom: 12px; }
+    .demo-header p { font-size: 1.05rem; color: var(--text-secondary); }
+
+    .generator-card {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 40px;
+      border: 1px solid var(--border-light);
+    }
+
+    .prompt-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s;
+    }
+    .prompt-input:focus { outline: none; border-color: var(--accent); }
+
+    .btn-generate { width: 100%; justify-content: center; font-size: 1.1rem; padding: 16px; }
+    .btn-generate.loading { opacity: 0.7; pointer-events: none; }
+    
+    /* Animation de chargement */
+    .magic-loader { display: none; text-align: center; padding: 40px 0; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid var(--accent-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Le document Devis (A4 Style Strict Pro) */
+    .quote-document-wrapper { display: none; margin-bottom: 40px; }
+    
+    .quote-document {
+      background: white;
+      border-radius: 0; /* Pas d'arrondi sur papier */
+      padding: 50px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
+      color: #000;
+      font-size: 0.95rem;
+      font-family: Arial, Helvetica, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* En Tête Devis */
+    .qd-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 24px; margin-bottom: 32px; flex-wrap: wrap; gap: 24px; }
+    .qd-company h2 { color: #000; margin-bottom: 8px; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
+    .qd-company p, .qd-client p, .qd-meta p { margin: 4px 0; color: #222; line-height: 1.4; }
+    .qd-client { border: 1px solid #000; padding: 16px 24px; min-width: 250px; }
+    
+    /* Meta devis */
+    .qd-meta-bar { display: flex; justify-content: space-between; margin-bottom: 32px; font-weight: bold; color: #000; }
+    
+    /* Table devis */
+    .qd-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    .qd-table th { text-align: left; background: #fff; padding: 12px; font-weight: bold; color: #000; border-top: 2px solid #000; border-bottom: 2px solid #000; }
+    .qd-table td { padding: 12px; border-bottom: 1px solid #ccc; color: #000; }
+    .qd-table .text-right { text-align: right; }
+    
+    /* Totaux */
+    .qd-totals { width: 300px; margin-left: auto; border: 1px solid #000; }
+    .qd-total-row { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #ccc; color: #000; }
+    .qd-total-row:last-child { border-bottom: none; }
+    .qd-total-row.main { font-weight: bold; font-size: 1.1rem; background: #fff; color: #000; border-top: 2px solid #000; margin-top: 0; }
+
+    /* Footer devis */
+    .qd-footer { border-top: 2px solid #000; margin-top: 40px; padding-top: 24px; font-size: 0.8rem; color: #222; text-align: center; }
+
+    .demo-footer { text-align: center; display: none; }
+
+    /* Responsive Document */
+    @media (max-width: 600px) {
+      .quote-document { padding: 20px; font-size: 0.85rem; }
+      .qd-header { flex-direction: column; }
+      .qd-meta-bar { flex-direction: column; gap: 8px; }
+      .qd-totals { width: 100%; }
+      .qd-table th, .qd-table td { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">Derovia</a>
+      <a href="questionnaire.html" class="btn btn-sm">Réserver un audit</a>
+    </div>
+  </nav>
+
+  <div class="demo-container">
+    
+    <div class="demo-header">
+      <div class="hero-badge" style="margin: 0 auto 16px;">
+        <i data-lucide="zap"></i>
+        <span>IA Propulsée par Groq</span>
+      </div>
+      <h1>Le Devis Magique ✨</h1>
+      <p>Testez l'automatisation. Décrivez votre intervention en langage naturel, l'IA rédige un devis légal en 2 secondes.</p>
+    </div>
+
+    <!-- Interface Prompt -->
+    <div class="generator-card" style="box-shadow: 0 20px 40px rgba(108,71,255,0.08); border-color: rgba(108,71,255,0.15);">
+      <textarea id="promptInput" class="prompt-input" placeholder="Ex: Réparation d'une fuite d'eau chez Monsieur Dupont au 12 rue de Paris. 2 heures de main d'oeuvre à 60€/h, plus un forfait déplacement à 40€ et deux joints à 15€ l'unité."></textarea>
+      <button id="generateBtn" class="btn btn-primary btn-lg">Générer le devis instantanément</button>
+    </div>
+
+    <!-- Chargement -->
+    <div id="loader" class="magic-loader">
+      <div class="spinner"></div>
+      <p style="font-weight: 500; color: var(--accent);">L'IA analyse votre texte et rédige le document...</p>
+    </div>
+
+    <!-- Document Résultat -->
+    <div id="quoteResult" class="quote-document-wrapper">
+      <div class="quote-document">
+        
+        <div class="qd-header">
+          <div class="qd-company">
+            <h2>Derovia Corp.</h2>
+            <p>123 Avenue des Champs</p>
+            <p>75000 Paris</p>
+            <p>SIRET : 900 000 000 00018</p>
+          </div>
+          <div class="qd-client">
+            <p style="font-weight: bold; color: #000; margin-bottom: 8px; text-decoration: underline;">Facturé à :</p>
+            <p id="clientName">Nom du client</p>
+            <p id="clientAddress">Adresse complète</p>
+          </div>
+        </div>
+
+        <div class="qd-meta-bar">
+          <div>N° Devis : <span id="quoteNumber">DEV-XXX</span></div>
+          <div>Date d'émission : <span id="quoteDate">XX/XX/XXXX</span></div>
+        </div>
+
+        <table class="qd-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-right">Qté</th>
+              <th class="text-right">Prix Unitaire HT</th>
+              <th class="text-right">Total HT</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+            <!-- Rempli dynamiquement -->
+          </tbody>
+        </table>
+
+        <div class="qd-totals">
+          <div class="qd-total-row">
+            <span>Sous-total HT</span>
+            <span id="subtotalHT">0,00 €</span>
+          </div>
+          <div class="qd-total-row">
+            <span>TVA (20%)</span>
+            <span id="taxAmount">0,00 €</span>
+          </div>
+          <div class="qd-total-row main">
+            <span>Total TTC</span>
+            <span id="totalTTC">0,00 €</span>
+          </div>
+        </div>
+
+        <div class="qd-footer">
+          <p>Devis valable <span id="validityDays">30</span> jours. Conformément à la législation en vigueur, un acompte de 30% est exigible à la commande.</p>
+          <p style="margin-top: 12px; font-weight: bold;">"Bon pour accord" - Date et Signature :</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer Action -->
+    <div id="demoFooter" class="demo-footer">
+      <h3 style="margin-bottom: 16px;">Vous perdez du temps sur vos propres devis ?</h3>
+      <p style="margin-bottom: 24px; color: var(--text-secondary);">Ceci n'est qu'une des centaines d'automatisations possibles. Dites-nous ce qui vous bloque au quotidien, on le supprime.</p>
+      <a href="questionnaire.html" class="btn btn-lg" style="margin: 0 auto;">Planifier mon automatisation personnalisée</a>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="js/devis.js"></script>
+</body>
+</html>
