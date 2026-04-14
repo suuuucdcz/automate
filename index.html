@@ -14,8 +14,11 @@
   <link rel="stylesheet" href="styles/components.css">
   <style>
     /* Spécifique à la vue Devis Magique */
-    body { background-color: var(--bg-secondary); min-height: 100vh; }
-    
+    body {
+      background: radial-gradient(circle at 50% -20%, rgba(108, 71, 255, 0.15), transparent 50%), var(--bg-secondary);
+      min-height: 100vh;
+    }
+
     .demo-container {
       max-width: 800px;
       margin: 0 auto;
@@ -129,18 +132,26 @@
   <div class="demo-container">
     
     <div class="demo-header">
-      <div class="hero-badge" style="margin: 0 auto 16px;">
+      <div class="hero-badge" style="margin: 0 auto 24px;">
         <i data-lucide="zap"></i>
         <span>IA Propulsée par Groq</span>
       </div>
-      <h1>Le Devis Magique ✨</h1>
-      <p>Testez l'automatisation. Décrivez votre intervention en langage naturel, l'IA rédige un devis légal en 2 secondes.</p>
+      <h1 style="font-size: 2.8rem; letter-spacing: -0.03em; margin-bottom: 16px;">
+        Générez vos Devis <span style="background: linear-gradient(90deg, var(--accent), #9b72ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">par Magie ✨</span>
+      </h1>
+      <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+        Testez notre outil interne. Décrivez simplement votre intervention en langage naturel, l'Intelligence Artificielle la transforme en document légal.
+      </p>
     </div>
 
     <!-- Interface Prompt -->
-    <div class="generator-card" style="box-shadow: 0 20px 40px rgba(108,71,255,0.08); border-color: rgba(108,71,255,0.15);">
-      <textarea id="promptInput" class="prompt-input" placeholder="Ex: Réparation d'une fuite d'eau chez Monsieur Dupont au 12 rue de Paris. 2 heures de main d'oeuvre à 60€/h, plus un forfait déplacement à 40€ et deux joints à 15€ l'unité."></textarea>
-      <button id="generateBtn" class="btn btn-primary btn-lg">Générer le devis instantanément</button>
+    <div class="generator-card" style="box-shadow: 0 24px 50px rgba(108,71,255,0.12); border: 1px solid rgba(108,71,255,0.25); padding: 32px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
+      <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="sparkles" style="color: var(--accent); width: 20px;"></i>
+        <span>Décrivez brièvement les travaux ou services :</span>
+      </div>
+      <textarea id="promptInput" class="prompt-input" placeholder="Ex: Réparation d'une fuite d'eau chez Monsieur Dupont au 12 rue de Paris. 2 heures de main d'oeuvre à 60€/h, plus un forfait déplacement à 40€ et deux joints à 15€ l'unité." style="border-radius: var(--radius-md); background: #fff; padding: 20px; font-size: 1.05rem;"></textarea>
+      <button id="generateBtn" class="btn btn-primary btn-lg" style="margin-top: 8px;">Générer le devis instantanément</button>
     </div>
 
     <!-- Chargement -->
